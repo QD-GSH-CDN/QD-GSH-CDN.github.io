@@ -26,6 +26,7 @@ try {
 			Common.modalGeneralCallback();
 			Common.setBodyClassByUtm();
 			Common.flagOff();
+			Common.removeSkinNeutral();
 		},
 		ajaxStop: function() {},
 		windowOnload: function() {},
@@ -115,6 +116,9 @@ try {
 				$t.parent().find("a").append('<div class="off-selo"></div>');
 				$t.parent().find(".off-selo").append($t);
 			});
+		},
+		removeSkinNeutral: function() {
+			$("#qd-skin-neutral").remove();
 		}
 	};
 
