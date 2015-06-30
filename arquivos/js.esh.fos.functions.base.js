@@ -310,6 +310,7 @@ try {
 				Search.multiAddToListCount();
 				Search.configBuyButton();
 				Search.callSmartCart();
+				List.dropdownmenuToggle();
 			}
 
 			Departament.searchNavigatorToggle();
@@ -598,7 +599,8 @@ try {
 			});
 		},
 		openShipping: function() {
-			ShippingValue();
+			if(typeof ShippingValue === "function")
+				ShippingValue();
 		}
 	};
 
@@ -620,10 +622,17 @@ try {
 			List.linkBuyOthersProducts();
 			List.autoGenerateListUrl();
 			List.searchFieldsValidate();
+			List.dropdownmenuToggle();
 		},
 		ajaxStop: function() {
 		},
 		windowOnload: function() {},
+		dropdownmenuToggle:function(){
+			// Amazing Menu Responsivo
+			$(".toggle-dropdown").click(function(){
+				$(".menu-dropdown-toggle > .navigation").slideToggle();
+			});
+		},
 		searchFieldsValidate: function() {
 			if(!$(document.body).is(".giftlistsearch"))
 				return;
