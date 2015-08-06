@@ -681,7 +681,7 @@ try {
 			if(!wrapper.length)
 				return;
 
-			var url = ["", "", ""];
+			var url = ["", "", "", ""];
 
 			wrapper.on("keyup focusout", "#membername1", function() {
 				url[0] = ($(this).val() || "").toLowerCase();
@@ -698,13 +698,27 @@ try {
 				setUrl();
 			});
 
-			function setUrl(value) {
+			function setUrl() {
 				// $("#giftlisturl").val(url.join(" ")).keyup();
 				$("#giftlisturl").val(url.join().replace(/[^a-z0-9]/ig, "")).keyup();
 			}
 
 			// Atualizando a informação ao carregar a página para já preencher quando os campos já possuirem informação
 			$("#membername1, #membername2, #giftlisteventdate").keyup();
+
+			// Obtendo a UTM via cookie e adicionando o ID da lista
+			try {
+				var utm = ($.cookie("qdUtmSource") || "").toLowerCase().trim();
+				if(utm == "espacosantahelena")
+					url[3] = "096";
+				else if(utm == "cleusa")
+					url[3] = "097";
+				else if(utm == "suxxar")
+					url[3] = "098";
+
+				setUrl();
+			}
+			catch (e) {(typeof console !== "undefined" && typeof console.error === "function" && console.error("Problemas :( . Detalhes: " + e.message)); }
 		},
 		linkNewListAddProducts: function() {
 			var link = $("a.qd_list_add_products");
