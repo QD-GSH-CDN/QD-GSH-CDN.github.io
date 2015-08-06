@@ -710,11 +710,11 @@ try {
 			try {
 				var utm = ($.cookie("qdUtmSource") || "").toLowerCase().trim();
 				if(utm == "espacosantahelena")
-					url[3] = "096";
+					url[3] = "96";
 				else if(utm == "cleusa")
-					url[3] = "097";
+					url[3] = "97";
 				else if(utm == "suxxar")
-					url[3] = "098";
+					url[3] = "98";
 
 				setUrl();
 			}
