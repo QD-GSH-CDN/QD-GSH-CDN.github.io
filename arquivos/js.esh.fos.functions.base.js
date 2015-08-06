@@ -607,6 +607,7 @@ try {
 	var List = {
 		run: function() {
 			List.redirectFormCreate();
+			List.insertUtmListViewer();
 		},
 		init: function() {
 			List.setBodyClassCloneList();
@@ -719,6 +720,22 @@ try {
 				setUrl();
 			}
 			catch (e) {(typeof console !== "undefined" && typeof console.error === "function" && console.error("Problemas :( . Detalhes: " + e.message)); }
+		},
+		insertUtmListViewer: function(){
+		if (location.pathname.search(/^\/list\/.+/) != 0)
+			return;
+
+			var utm = (location.search.match(/utm_source\=([^&]+)/i) || [""]).pop();
+			if(utm == "espacosantahelena" || utm == "cleusa" || utm == "suxxar")
+				return;
+
+			var id = (location.pathname.match(/[0-9]{2}$/i) || [""]).pop();
+			if(id == 96)
+				location.search = location.search.replace(/utm_source\=([^&]+)/ig, "") + "&utm_source=espacosantahelena";
+			else if(id == 97)
+				location.search = location.search.replace(/utm_source\=([^&]+)/ig, "") + "&utm_source=cleusa";
+			else if(id == 98)
+				location.search = location.search.replace(/utm_source\=([^&]+)/ig, "") + "&utm_source=suxxar";
 		},
 		linkNewListAddProducts: function() {
 			var link = $("a.qd_list_add_products");
@@ -876,7 +893,7 @@ try {
 									else
 										body.html('<p class="qd-giftlist-empty">Você ainda não possui nenhuma lista, <a href="/giftlist/create">crie a sua aqui</a></p>');
 								},
-								error:  function() {alert("Não foi possível obter suas listas. Por favor entre em contato com o SAC.");},
+								error:  function() {alert("Não foi possível obter suas listas. Por favor entre em contato com o SAC.");}
 							});
 						}
 						else{
@@ -978,7 +995,7 @@ try {
 		Common.run();
 		if (location.pathname.substr(location.pathname.length - 2, 2).toLowerCase() == "/p")
 			Product.run();
-		else if (location.pathname.search(/^\/giftlist/) == 0)
+		else if (location.pathname.search(/^(\/giftlist|\/list\/)/) == 0)
 			List.run();
 
 		// Corrigndo bug do riseze causado pelo jQuery PrettyPhoto
