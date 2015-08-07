@@ -729,12 +729,12 @@ try {
 			if(utm == "espacosantahelena" || utm == "cleusa" || utm == "suxxar")
 				return;
 
-			var id = (location.pathname.match(/[0-9]{2}$/i) || [""]).pop();
-			if(id == 96)
+			var id = (location.pathname.match(/[0-9]{8}([0-9]{2})$/i) || [""]).pop();
+			if(id == 96 || id == 14)
 				location.search = location.search.replace(/utm_source\=([^&]+)/ig, "") + "&utm_source=espacosantahelena";
-			else if(id == 97)
+			else if(id == 97 || id == 10 || id == 12)
 				location.search = location.search.replace(/utm_source\=([^&]+)/ig, "") + "&utm_source=cleusa";
-			else if(id == 98)
+			else if(id == 98 || id == 15)
 				location.search = location.search.replace(/utm_source\=([^&]+)/ig, "") + "&utm_source=suxxar";
 		},
 		linkNewListAddProducts: function() {
