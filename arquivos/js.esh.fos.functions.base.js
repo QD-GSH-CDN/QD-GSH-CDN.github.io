@@ -624,6 +624,7 @@ try {
 			List.autoGenerateListUrl();
 			List.searchFieldsValidate();
 			List.dropdownmenuToggle();
+			List.listMemberNameFileds();
 		},
 		ajaxStop: function() {
 		},
@@ -633,6 +634,18 @@ try {
 			$(".toggle-dropdown").click(function(){
 				$(".menu-dropdown-toggle > .navigation").slideToggle();
 			});
+		},
+		listMemberNameFileds: function() {
+			try {
+				var name = $("#membername1");
+				if(name.prop('defaultValue') == name.val())
+					name.val("");
+
+				var surname = $("#membersurname1");
+				if(surname.prop('defaultValue') == surname.val())
+					surname.val("");
+			}
+			catch (e) {(typeof console !== "undefined" && typeof console.error === "function" && console.error("Problemas :( . Detalhes: " + e.message)); }
 		},
 		searchFieldsValidate: function() {
 			if(!$(document.body).is(".giftlistsearch"))
