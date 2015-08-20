@@ -550,9 +550,19 @@ try {
 			Product.shippingFormPlaceholder();
 			Product.showShipping();
 			Product.openShipping();
+			Product.setProductLinkQty();
 		},
-		ajaxStop: function() {},
+		ajaxStop: function() {
+			Product.setProductLinkQty();
+		},
 		windowOnload: function() {},
+		setProductLinkQty: function() {
+			var gr = (location.search.match(/gr\=[^&]+/i) || [""]).pop();
+			var qty = (location.search.match(/qty\=[^&]+/i) || [""]).pop();
+			$("a.buy-button[href^='/checkout/cart/add']:not(.qd-splq-on)").addClass("qd-splq-on").each(function() {
+				this.search = ((this.search || "").replace(/gr\=[^&]+/ig, "").replace(/qty\=[^&]+/ig, "") + "&" + gr + "&" + qty).replace(/\&+/ig, "&");
+			});
+		},
 		forceImageZoom: function() {
 			try {
 				var orig = window.ImageControl;
@@ -625,8 +635,12 @@ try {
 			List.searchFieldsValidate();
 			List.dropdownmenuToggle();
 			List.listMemberNameFileds();
+			List.listProductToCartFix();
+			List.setProductLinkQty();
 		},
 		ajaxStop: function() {
+			List.setProductLinkQty();
+			List.listProductToCartFix();
 		},
 		windowOnload: function() {},
 		dropdownmenuToggle:function(){
@@ -646,6 +660,14 @@ try {
 					surname.val("");
 			}
 			catch (e) {(typeof console !== "undefined" && typeof console.error === "function" && console.error("Problemas :( . Detalhes: " + e.message)); }
+		},
+		setProductLinkQty: function() {
+			$("li[layout]:not(.qd-splq-on)").addClass("qd-splq-on").each(function() {
+				var $t = $(this);
+				$t.find("a[href*='/p']").each(function() {
+					this.search = ((this.search || "").replace(/gr\=[^&]+/ig, "").replace(/qty\=[^&]+/ig, "") + "&gr=" + jscheckoutGiftListId + "&qty=" + (parseInt($t.find(".amount-cart").text(), 10) || 1)).replace(/\&+/ig, "&");
+				});
+			});
 		},
 		searchFieldsValidate: function() {
 			if(!$(document.body).is(".giftlistsearch"))
@@ -673,6 +695,11 @@ try {
 				else
 					return result;
 			}
+		},
+		listProductToCartFix: function() {
+			$(".btn-add-buy-button-asynchronous:not(.qd-lpcf-on)").addClass("qd-lpcf-on").each(function() {
+				this.search = (this.search.replace(/gr\=[^&]+/ig, "").replace(/qty\=[^&]+/ig, "") + "&gr=" + jscheckoutGiftListId + "&qty=" + (parseInt($(this).getParent("li[layout]").find(".amount-cart").text(), 10) || 1)).replace(/\&+/ig, "&");
+			});
 		},
 		organizingItems: function() {
 			var wrapper = $('<div class="wrapperGiftListInfoV2"></div>');
@@ -761,7 +788,8 @@ try {
 			var link = $(".btn-buy-other-gifts");
 
 			if(link.length)
-				link.attr("href", "/busca?utmqd_source=listadd_" + (($(".action-buy a:first").attr("id") || "").match(/\-([0-9]+)/i) || [""]).pop());
+				link.attr("href", "/busca?utmqd_source=listadd_" + (jscheckoutGiftListId || "-error-"));
+				// link.attr("href", "/busca?utmqd_source=listadd_" + (($(".action-buy a:first").attr("id") || "").match(/\-([0-9]+)/i) || [""]).pop());
 		},
 		setBodyClassCloneList: function() {
 			if (location.search.search(/utmqd_source\=clone_list/i) > -1)
