@@ -310,6 +310,7 @@ try {
 				Search.multiAddToListCount();
 				Search.configBuyButton();
 				Search.callSmartCart();
+				List.dropdownmenuToggle();
 			}
 
 			Departament.searchNavigatorToggle();
@@ -549,9 +550,19 @@ try {
 			Product.shippingFormPlaceholder();
 			Product.showShipping();
 			Product.openShipping();
+			Product.setProductLinkQty();
 		},
-		ajaxStop: function() {},
+		ajaxStop: function() {
+			Product.setProductLinkQty();
+		},
 		windowOnload: function() {},
+		setProductLinkQty: function() {
+			var gr = (location.search.match(/gr\=[^&]+/i) || [""]).pop();
+			var qty = (location.search.match(/qty\=[^&]+/i) || [""]).pop();
+			$("a.buy-button[href^='/checkout/cart/add']:not(.qd-splq-on)").addClass("qd-splq-on").each(function() {
+				this.search = ((this.search || "").replace(/gr\=[^&]+/ig, "").replace(/qty\=[^&]+/ig, "") + "&" + gr + "&" + qty).replace(/\&+/ig, "&");
+			});
+		},
 		forceImageZoom: function() {
 			try {
 				var orig = window.ImageControl;
@@ -598,13 +609,15 @@ try {
 			});
 		},
 		openShipping: function() {
-			ShippingValue();
+			if(typeof ShippingValue === "function")
+				ShippingValue();
 		}
 	};
 
 	var List = {
 		run: function() {
 			List.redirectFormCreate();
+			List.insertUtmListViewer();
 		},
 		init: function() {
 			List.setBodyClassCloneList();
@@ -620,10 +633,42 @@ try {
 			List.linkBuyOthersProducts();
 			List.autoGenerateListUrl();
 			List.searchFieldsValidate();
+			List.dropdownmenuToggle();
+			List.listMemberNameFileds();
+			List.listProductToCartFix();
+			List.setProductLinkQty();
 		},
 		ajaxStop: function() {
+			List.setProductLinkQty();
+			List.listProductToCartFix();
 		},
 		windowOnload: function() {},
+		dropdownmenuToggle:function(){
+			// Amazing Menu Responsivo
+			$(".toggle-dropdown").click(function(){
+				$(".menu-dropdown-toggle > .navigation").slideToggle();
+			});
+		},
+		listMemberNameFileds: function() {
+			try {
+				var name = $("#membername1");
+				if(name.prop('defaultValue') == name.val())
+					name.val("");
+
+				var surname = $("#membersurname1");
+				if(surname.prop('defaultValue') == surname.val())
+					surname.val("");
+			}
+			catch (e) {(typeof console !== "undefined" && typeof console.error === "function" && console.error("Problemas :( . Detalhes: " + e.message)); }
+		},
+		setProductLinkQty: function() {
+			$("li[layout]:not(.qd-splq-on)").addClass("qd-splq-on").each(function() {
+				var $t = $(this);
+				$t.find("a[href*='/p']").each(function() {
+					this.search = ((this.search || "").replace(/gr\=[^&]+/ig, "").replace(/qty\=[^&]+/ig, "") + "&gr=" + jscheckoutGiftListId + "&qty=" + (parseInt($t.find(".amount-cart").text(), 10) || 1)).replace(/\&+/ig, "&");
+				});
+			});
+		},
 		searchFieldsValidate: function() {
 			if(!$(document.body).is(".giftlistsearch"))
 				return;
@@ -651,6 +696,11 @@ try {
 					return result;
 			}
 		},
+		listProductToCartFix: function() {
+			$(".btn-add-buy-button-asynchronous:not(.qd-lpcf-on)").addClass("qd-lpcf-on").each(function() {
+				this.search = (this.search.replace(/gr\=[^&]+/ig, "").replace(/qty\=[^&]+/ig, "") + "&gr=" + jscheckoutGiftListId + "&qty=" + (parseInt($(this).getParent("li[layout]").find(".amount-cart").text(), 10) || 1)).replace(/\&+/ig, "&");
+			});
+		},
 		organizingItems: function() {
 			var wrapper = $('<div class="wrapperGiftListInfoV2"></div>');
 			var listUrl = $(".giftlistinfo-link input").val();
@@ -672,7 +722,7 @@ try {
 			if(!wrapper.length)
 				return;
 
-			var url = ["", "", ""];
+			var url = ["", "", "", ""];
 
 			wrapper.on("keyup focusout", "#membername1", function() {
 				url[0] = ($(this).val() || "").toLowerCase();
@@ -689,13 +739,43 @@ try {
 				setUrl();
 			});
 
-			function setUrl(value) {
+			function setUrl() {
 				// $("#giftlisturl").val(url.join(" ")).keyup();
 				$("#giftlisturl").val(url.join().replace(/[^a-z0-9]/ig, "")).keyup();
 			}
 
 			// Atualizando a informação ao carregar a página para já preencher quando os campos já possuirem informação
 			$("#membername1, #membername2, #giftlisteventdate").keyup();
+
+			// Obtendo a UTM via cookie e adicionando o ID da lista
+			try {
+				var utm = ($.cookie("qdUtmSource") || "").toLowerCase().trim();
+				if(utm == "espacosantahelena")
+					url[3] = "96";
+				else if(utm == "cleusa")
+					url[3] = "97";
+				else if(utm == "suxxar")
+					url[3] = "98";
+
+				setUrl();
+			}
+			catch (e) {(typeof console !== "undefined" && typeof console.error === "function" && console.error("Problemas :( . Detalhes: " + e.message)); }
+		},
+		insertUtmListViewer: function(){
+		if (location.pathname.search(/^\/list\/.+/) != 0)
+			return;
+
+			var utm = (location.search.match(/utm_source\=([^&]+)/i) || [""]).pop();
+			if(utm == "espacosantahelena" || utm == "cleusa" || utm == "suxxar")
+				return;
+
+			var id = (location.pathname.match(/[0-9]{8}([0-9]{2})$/i) || [""]).pop();
+			if(id == 96 || id == 14)
+				location.search = location.search.replace(/utm_source\=([^&]+)/ig, "") + "&utm_source=espacosantahelena";
+			else if(id == 97 || id == 10 || id == 12)
+				location.search = location.search.replace(/utm_source\=([^&]+)/ig, "") + "&utm_source=cleusa";
+			else if(id == 98 || id == 15)
+				location.search = location.search.replace(/utm_source\=([^&]+)/ig, "") + "&utm_source=suxxar";
 		},
 		linkNewListAddProducts: function() {
 			var link = $("a.qd_list_add_products");
@@ -708,7 +788,8 @@ try {
 			var link = $(".btn-buy-other-gifts");
 
 			if(link.length)
-				link.attr("href", "/busca?utmqd_source=listadd_" + (($(".action-buy a:first").attr("id") || "").match(/\-([0-9]+)/i) || [""]).pop());
+				link.attr("href", "/busca?utmqd_source=listadd_" + (jscheckoutGiftListId || "-error-"));
+				// link.attr("href", "/busca?utmqd_source=listadd_" + (($(".action-buy a:first").attr("id") || "").match(/\-([0-9]+)/i) || [""]).pop());
 		},
 		setBodyClassCloneList: function() {
 			if (location.search.search(/utmqd_source\=clone_list/i) > -1)
@@ -853,7 +934,7 @@ try {
 									else
 										body.html('<p class="qd-giftlist-empty">Você ainda não possui nenhuma lista, <a href="/giftlist/create">crie a sua aqui</a></p>');
 								},
-								error:  function() {alert("Não foi possível obter suas listas. Por favor entre em contato com o SAC.");},
+								error:  function() {alert("Não foi possível obter suas listas. Por favor entre em contato com o SAC.");}
 							});
 						}
 						else{
@@ -955,7 +1036,7 @@ try {
 		Common.run();
 		if (location.pathname.substr(location.pathname.length - 2, 2).toLowerCase() == "/p")
 			Product.run();
-		else if (location.pathname.search(/^\/giftlist/) == 0)
+		else if (location.pathname.search(/^(\/giftlist|\/list\/)/) == 0)
 			List.run();
 
 		// Corrigndo bug do riseze causado pelo jQuery PrettyPhoto
